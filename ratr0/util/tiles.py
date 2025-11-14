@@ -235,11 +235,21 @@ def write_tile_file(outfile, im, tile_size,
     # add an additional plane that merges down the 1 bits of the planes list
     if create_mask:
         mask_plane = [0] * len(planes[0])
+        # Use color 15 as mask version
         for i in range(len(mask_plane)):
-            w = 0
+            w = planes[0][i]
             for plane in planes:
-                w |= plane[i]
+                w &= plane[i]
+            # invert v value
+            w ^= 0xffff
             mask_plane[i] = w
+
+        # Use color 0 as mask version
+        # for i in range(len(mask_plane)):
+        #    w = 0
+        #    for plane in planes:
+        #        w |= plane[i]
+        #    mask_plane[i] = w
 
     with open(outfile, 'wb') as out:
         tiles_info = TilesInfo(FILE_FORMAT_VERSION, flags,
